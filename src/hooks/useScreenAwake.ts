@@ -1,17 +1,18 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const useScreenAwake = () => {
   // Function to keep the screen awake
   const [isAwake, setIsAwake] = useState(false);
+  const wakeLock = useRef(null);
 
   const setKeepAwake = useCallback(async (value: boolean) => {
     const navigator = window.navigator as any;
     if ('wakeLock' in navigator) {
       if (value) {
-        await navigator.wakeLock.request('screen');
+        wakeLock.current = await navigator.wakeLock.request('screen');
         setIsAwake(true);
       } else {
-        await navigator.wakeLock.release();
+        wakeLock.current.release();
         setIsAwake(false);
       }
     }
